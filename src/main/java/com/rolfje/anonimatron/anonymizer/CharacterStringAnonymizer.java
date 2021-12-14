@@ -33,7 +33,12 @@ public class CharacterStringAnonymizer implements Anonymizer {
 
     @Override
     public Synonym anonymize(Object from, int size, boolean shortlived, Map<String, String> parameters) {
-        if (parameters == null || !parameters.containsKey(PARAMETER)) {
+        if (parameters == null) {
+            return anonymize(from, size, shortlived);
+        }
+
+
+        if (!parameters.containsKey(PARAMETER)) {
             throw new UnsupportedOperationException("Please provide '" + PARAMETER + "' as configuration parameter.");
         }
         return anonymize(from, size, shortlived, parameters.get(PARAMETER));
