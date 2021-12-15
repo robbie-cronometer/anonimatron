@@ -367,20 +367,9 @@ public class JdbcAnonymizerService {
             String primaryKeys = "";
             while (resultset.next()) {
                 String columnName = resultset.getString("COLUMN_NAME");
-                if (columnNames.contains(columnName)) {
-                    String msg = "Column " + columnName + " in table " + table.getName()
-                            + " can not be anonimyzed because it is also a primary key.";
-                    LOG.error(msg);
-                    throw new RuntimeException(msg);
-                } else {
+                if (!columnNames.contains(columnName)) {
                     primaryKeys += columnName + ", ";
                 }
-            }
-
-            if (primaryKeys.length() < 1) {
-                String msg = "Table " + table.getName() + " does not contain a primary key and can not be anonymyzed.";
-                LOG.error(msg);
-                throw new RuntimeException(msg);
             }
 
             return primaryKeys;
