@@ -9,6 +9,7 @@ public class Table {
     private Integer fetchSize;
     private List<Column> columns;
     private List<Discriminator> discriminators;
+    private boolean whiteListEmails;
 
     // Used for progress monitoring
     private long numberOfRows;
@@ -62,5 +63,15 @@ public class Table {
     public void setNumberOfRows(long numberOfRows) {
         this.numberOfRows = numberOfRows;
     }
+
+    public boolean getWhiteListEmails() {
+        return this.whiteListEmails;
+    }
+
+    public void setWhiteListEmails(boolean whiteListEmails) {
+        this.whiteListEmails = whiteListEmails;
+    }
+
+
 
 }

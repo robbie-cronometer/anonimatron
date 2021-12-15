@@ -45,6 +45,10 @@
 			<bind-xml name="name" node="attribute" />
 		</field>
 
+		<field name="whiteListEmails" type="boolean" required="false">
+			<bind-xml name="whiteListEmails" node="attribute" />
+		</field>
+
 		<field name="fetchSize" type="integer">
 			<bind-xml name="fetchSize" node="attribute" />
 		</field>

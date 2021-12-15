@@ -141,9 +141,10 @@ public class JdbcAnonymizerService {
         Statement statement = null;
         ResultSet results = null;
         long rowsleft = table.getNumberOfRows();
+
         try {
             NDC.push("Table '" + table.getName() + "'");
-            String select = getSelectStatement(table);
+            String select = getSelectStatement(table, table.getWhiteListEmails());
             LOG.debug(select);
 
             statement = connection.createStatement(resultSetType, resultSetConcurrency);
@@ -170,8 +171,11 @@ public class JdbcAnonymizerService {
                  * TODO This is now a strange way to stop the loop on synonym depletion and needs refactoring.
                  */
                 processNextRecord = false || columnsAsList.isEmpty();
+            
 
                 for (Column column : columnsAsList) {
+
+
                     // Build a synonym for each column in this row
                     NDC.push("Column '" + column.getName() + "'");
 
@@ -310,7 +314,7 @@ public class JdbcAnonymizerService {
         }
     }
 
-    private String getSelectStatement(Table table) throws SQLException {
+    private String getSelectStatement(Table table, boolean whiteListEmails) throws SQLException {
         Set<String> columnNames = new HashSet<>();
         if (table.getColumns() != null) {
             for (Column column : table.getColumns()) {
@@ -341,6 +345,9 @@ public class JdbcAnonymizerService {
 
         select = select.substring(0, select.lastIndexOf(", "));
         select += " from " + table.getName();
+        if (whiteListEmails) {
+            select += " where email not like '%@cronometer.com'";
+        }
         return select;
     }
 
