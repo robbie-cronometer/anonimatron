@@ -37,6 +37,13 @@
       </includes>
     </fileSet>
     <fileSet>
+      <directory>resources/config</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>*.*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>resources/scripts</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
