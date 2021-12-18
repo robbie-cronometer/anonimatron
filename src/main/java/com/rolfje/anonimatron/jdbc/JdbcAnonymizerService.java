@@ -45,11 +45,19 @@ public class JdbcAnonymizerService {
                 + " tables.\n");
     }
 
+
     public void anonymize() throws SQLException {
         printConfigurationInfo();
 
         // Get records to do
-        List<Table> tables = config.getTables();
+        List<Table> tables = new ArrayList<>();
+
+        for (Table table : config.getTables()) {
+            if (doesTableExist(table)) {
+                tables.add(table);
+            }
+        }
+
         int totalRows = 0;
         for (Table table : tables) {
             // Get the total number of records to process
@@ -85,6 +93,26 @@ public class JdbcAnonymizerService {
         }
 
         System.out.println("\nAnonymization process completed.\n");
+    }
+
+    private boolean doesTableExist(Table table) {
+        try (PreparedStatement s = connection.prepareStatement(
+            "show tables like ?")) {
+                 s.setString(1, table.getName());
+                 s.execute();
+                 ResultSet tables = s.getResultSet();
+                 if (!tables.next()) {
+                    String message = "Table " + table.getName() + " does not exist or I don't have show tables permissions. Skipping table. ";
+                    System.out.println(message);
+                    LOG.error(message);
+                    return false;
+                 }
+                 return true;
+
+             } catch (Exception e) {
+            LOG.fatal("Anonymyzation stopped because of fatal error.", e);
+            throw new RuntimeException(e);
+        } 
     }
 
     private void setConnection() throws SQLException {
@@ -137,12 +165,18 @@ public class JdbcAnonymizerService {
     }
 
     private void processTableColumns(Table table, final ColumnWorker columnWorker, int resultSetType, int resultSetConcurrency) {
+        
+
         // Create an updatable resultset for the rows.
         Statement statement = null;
         ResultSet results = null;
         long rowsleft = table.getNumberOfRows();
 
+
+
         try {
+
+
             NDC.push("Table '" + table.getName() + "'");
             String select = getSelectStatement(table, table.getWhiteListEmails());
             LOG.debug(select);
@@ -163,6 +197,16 @@ public class JdbcAnonymizerService {
             while (results.next() && processNextRecord) {
                 Collection<Column> columnsAsList = getDiscriminatedColumnConfiguration(table, results);
 
+
+                if (table.hasWhitelist()) {
+                    Object whiteListColumnValue = results.getObject(table.getWhitelistColumnName());
+
+                    if (whiteListColumnValue != null) {
+                        if (config.isWhitelisted(whiteListColumnValue, table.getWhichWhitelist())) {
+                            continue;
+                        }
+                    }
+                }
                 /*
                  * If any of the calls to the worker indicate that
                  * we need to continue, we'll fetch the next result (see below).

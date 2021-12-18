@@ -32,6 +32,12 @@
 			<bind-xml name="table" />
 		</field>
 
+		<field name="whitelists" collection="arraylist"
+			   type="com.rolfje.anonimatron.configuration.Whitelist">
+			<bind-xml name="whitelist" />
+		</field>
+
+
 		<field name="files" collection="arraylist"
 			   type="com.rolfje.anonimatron.configuration.DataFile">
 			<bind-xml name="file" />
@@ -44,6 +50,15 @@
 		<field name="name" type="string">
 			<bind-xml name="name" node="attribute" />
 		</field>
+
+		<field name="whitelistColumnName" type="string">
+			<bind-xml name="whitelistColumnName" node="attribute" />
+		</field>
+
+		<field name="whichWhitelist" type="string">
+			<bind-xml name="whichWhitelist" node="attribute" />
+		</field>
+
 
 		<field name="whiteListEmails" type="boolean" required="false">
 			<bind-xml name="whiteListEmails" node="attribute" />
@@ -137,4 +152,20 @@
 			<bind-xml name="column" />
 		</field>
 	</class>
+
+	<class name="com.rolfje.anonimatron.configuration.Whitelist">
+		<map-to xml="whitelist" />
+
+		<field name="name" type="string">
+			<bind-xml name="name" node="attribute" />
+		</field>
+
+
+		<field name="values" collection="arraylist"
+			type="string">
+			<bind-xml name="value" node="element"/>
+		</field>
+	</class>
+
+
 </mapping>

@@ -35,6 +35,8 @@ public class Configuration {
 	private List<DataFile> files;
 	private List<String> anonymizerClasses;
 	private List<String> fileFilters;
+	private List<Whitelist> whitelists;
+
 	private boolean dryrun = false;
 	public boolean isDryrun() {
 		return dryrun;
@@ -42,6 +44,16 @@ public class Configuration {
 
 	public void setDryrun(boolean dryrun) {
 		this.dryrun = dryrun;
+	}
+
+	public boolean isWhitelisted(Object toCheck, String listName) {
+		for (Whitelist list : whitelists) {
+			if (list.getName().equalsIgnoreCase(listName)) {
+				return list.isWhitelisted(toCheck);
+			}
+		}
+		System.out.println("Warning can't find whitelist " + listName);
+		return false;
 	}
 
 	public static Configuration readFromFile(String filename) throws Exception {
@@ -87,6 +99,14 @@ public class Configuration {
 		marshaller.setMapping(mapping);
 		marshaller.marshal(createConfiguration());
 		return stringWriter.toString();
+	}
+
+	public List<Whitelist> getWhitelists() {
+		return this.whitelists;
+	}
+
+	public void setWhitelists(List<Whitelist> whitelists) {
+		this.whitelists = whitelists;
 	}
 
 	public void setAnonymizerClasses(List<String> anonymizerClasses) {

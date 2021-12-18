@@ -10,9 +10,32 @@ public class Table {
     private List<Column> columns;
     private List<Discriminator> discriminators;
     private boolean whiteListEmails;
+    private String whitelistColumnName;
+    private String whichWhitelist;
 
     // Used for progress monitoring
     private long numberOfRows;
+
+
+    public String getWhitelistColumnName() {
+        return this.whitelistColumnName;
+    }
+
+    public boolean hasWhitelist() {
+        return whitelistColumnName != null && !whitelistColumnName.isEmpty();
+    }
+
+    public void setWhitelistColumnName(String whitelistColumnName) {
+        this.whitelistColumnName = whitelistColumnName;
+    }
+
+    public String getWhichWhitelist() {
+        return this.whichWhitelist;
+    }
+
+    public void setWhichWhitelist(String whichWhitelist) {
+        this.whichWhitelist = whichWhitelist;
+    }
 
     public String getName() {
         return name;
