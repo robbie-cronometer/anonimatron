@@ -5,7 +5,14 @@
   REPLACE WITH ACTUAL CONFIGURATION FOR TABLES
 
   <!--
-  <table name="users" whiteListEmails="True" >
+
+   <whitelist name="userid">
+    <value>502551</value>
+    <value>502550</value>
+  </whitelist>
+
+
+  <table name="users" whichWhitelist="userid" whitelistColumnName="userId">
     <column name="firstname" type="ROMAN_NAME" />
     <column name="nickname" type="ROMAN_NAME" />
     <column name="lastname" type="ELVEN_NAME" />
