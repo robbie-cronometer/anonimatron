@@ -9,7 +9,6 @@ public class Table {
     private Integer fetchSize;
     private List<Column> columns;
     private List<Discriminator> discriminators;
-    private boolean whiteListEmails;
     private String whitelistColumnName;
     private String whichWhitelist;
 
@@ -87,13 +86,6 @@ public class Table {
         this.numberOfRows = numberOfRows;
     }
 
-    public boolean getWhiteListEmails() {
-        return this.whiteListEmails;
-    }
-
-    public void setWhiteListEmails(boolean whiteListEmails) {
-        this.whiteListEmails = whiteListEmails;
-    }
 
 
 

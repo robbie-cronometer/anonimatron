@@ -178,7 +178,7 @@ public class JdbcAnonymizerService {
 
 
             NDC.push("Table '" + table.getName() + "'");
-            String select = getSelectStatement(table, table.getWhiteListEmails());
+            String select = getSelectStatement(table);
             LOG.debug(select);
 
             statement = connection.createStatement(resultSetType, resultSetConcurrency);
@@ -265,6 +265,9 @@ public class JdbcAnonymizerService {
             }
 
         } catch (Exception e) {
+            System.out.println();
+            System.out.println("Exception while processing table " + table.getName());
+            System.out.println();
             LOG.fatal("Anonymyzation stopped because of fatal error.", e);
             throw new RuntimeException(e);
         } finally {
@@ -358,12 +361,16 @@ public class JdbcAnonymizerService {
         }
     }
 
-    private String getSelectStatement(Table table, boolean whiteListEmails) throws SQLException {
+    private String getSelectStatement(Table table) throws SQLException {
         Set<String> columnNames = new HashSet<>();
         if (table.getColumns() != null) {
             for (Column column : table.getColumns()) {
                 columnNames.add(column.getName());
             }
+        }
+
+        if (table.hasWhitelist() && !columnNames.contains(table.getWhitelistColumnName())) {
+            columnNames.add(table.getWhitelistColumnName());
         }
 
         if (table.getDiscriminators() != null) {
@@ -383,15 +390,13 @@ public class JdbcAnonymizerService {
 
         String select = "select " + primaryKeys;
 
+
         for (String columnName : columnNames) {
             select += columnName + ", ";
         }
 
         select = select.substring(0, select.lastIndexOf(", "));
         select += " from " + table.getName();
-        if (whiteListEmails) {
-            select += " where email not like '%@cronometer.com'";
-        }
         return select;
     }
 
