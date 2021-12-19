@@ -42,7 +42,7 @@ public class DigitStringAnonymizer extends AbstractElevenProofAnonymizer {
 
         return new StringSynonym(
                 getType(),
-                (String) from,
+                from.toString(),
                 to,
                 shortlived
         );
