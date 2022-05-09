@@ -4,7 +4,7 @@ import com.rolfje.anonimatron.synonyms.StringSynonym;
 import com.rolfje.anonimatron.synonyms.Synonym;
 
 public class StringAnonymizer implements Anonymizer {
-    private static final String TYPE = "STRING";
+    public static final String TYPE = "STRING";
 
     @Override
     public Synonym anonymize(Object from, int size, boolean shortlived) {
@@ -40,4 +40,5 @@ public class StringAnonymizer implements Anonymizer {
     public String getType() {
         return TYPE;
     }
+
 }
