@@ -12,7 +12,8 @@ public class JsonAnonymizerTest
    String testJson = "{\n" + "   \"potato1\":\"Potato\",\n" + "   \"tomato1\":\"Tomato\",\n" + "   \"potato2\":\"Potato\",\n"
          + "   \"numbertest\": 123,\n" + "   \"numbertest2\": 456,\n" + "    \"numbertest1copy\": 123,\n" + "   \"wholeObject\" : {\n"
          + "       \"innerpotato\": Potato,\n" + "       \"innerList\": [\"ham\", 123, {\"innerObjectArray\": [99]}]\n" + "    },\n"
-         + "  \"array\" : [\"hello\", [\"I'm nested\"]]\n" + "}";
+         + "  \"array\" : [\"hello\", [\"I'm nested\"]],\n" + "  \"whitelistme\" : \"preserveme\",\n"
+         + "  \"alsowhitelisted\" : 69420\n" + "}";
 
    @Test
    public void testAnonymisation() {
@@ -25,8 +26,9 @@ public class JsonAnonymizerTest
       anonymizerMap.put(sa.getType(), sa);
       SynonymCache sc = new SynonymCache();
 
-
-      Synonym synonym = anonymiser.anonymize(anonymizerMap, sc, testJson, Integer.MAX_VALUE, false);
+      Map<String, String> parameters = new HashMap<>();
+      parameters.put("whitelist", "whitelistme,alsowhitelisted");
+      Synonym synonym = anonymiser.anonymize(anonymizerMap, sc, testJson, Integer.MAX_VALUE, false, parameters);
       System.out.println(synonym.getTo().toString());
       JSONObject out = new JSONObject((String) synonym.getTo());
       for (String key: in.keySet()) {
@@ -35,6 +37,10 @@ public class JsonAnonymizerTest
       for (String key: out.keySet()) {
          Assert.assertTrue(in.has(key));
       }
+
+      // checkwhitelist values
+      Assert.assertEquals(in.getString("whitelistme"), out.getString("whitelistme"));
+      Assert.assertEquals(in.getNumber("alsowhitelisted"), out.getNumber("alsowhitelisted"));
 
       Assert.assertTrue(out.get("potato1") instanceof String);
       Assert.assertFalse(((String) out.get("potato1")).isEmpty());

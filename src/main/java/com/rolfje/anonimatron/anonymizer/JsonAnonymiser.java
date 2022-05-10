@@ -10,7 +10,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 public class JsonAnonymiser implements MultiFieldAnonymiser {
 
-   Set<String> whiteList = new HashSet<>();
+
    public static final String type = "JSON";
 
    @Override
@@ -21,10 +21,19 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
    private static final Logger logger = getLogger(JsonAnonymiser.class);
 
    @Override
-   public Synonym anonymize(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, Object from, int size, boolean shortlived) {
+   public Synonym anonymize(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, Object from, int size, boolean shortlived,
+         Map<String, String> parameters) {
       if (from != null && !(from instanceof String)) {
          logger.error("Unable to read value as json. Returning {} for value " + from);
          return new StringSynonym(StringAnonymizer.TYPE, (String) from, "{}", shortlived);
+      }
+
+      Set<String> whiteListLowerCase = new HashSet<>();
+      if (parameters.containsKey("whitelist")) {
+         String[] whitelistedFields = parameters.get("whitelist").split(",");
+         for (String field : whitelistedFields) {
+            whiteListLowerCase.add(field.trim());
+         }
       }
 
       JSONObject jo;
@@ -36,11 +45,11 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
       }
 
       return new StringSynonym(StringAnonymizer.TYPE, (String) from,
-            anonymizeJsonObject(anonymizerMap, synonymCache, jo, size, shortlived).toString(), shortlived);
+            anonymizeJsonObject(anonymizerMap, synonymCache, jo, size, shortlived, whiteListLowerCase).toString(), shortlived);
    }
 
    public JSONObject anonymizeJsonObject(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, JSONObject fromJo, int size,
-         boolean shortlived) {
+         boolean shortlived, Set<String> whiteListLowerCase) {
       if (fromJo == null) {
          return null;
       }
@@ -51,19 +60,21 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
          Iterator<String> keys = fromJo.keys();
          while (keys.hasNext()) {
             String key = keys.next();
-            if (isWhitelisted(key)) {
+            Object theObj = fromJo.get(key);
+
+            if (whiteListLowerCase.contains(key.toLowerCase())) {
+               to.put(key, theObj);
                continue;
             }
-            Object theObj = fromJo.get(key);
 
             if (theObj == null || theObj == JSONObject.NULL) {
                to.putOpt(key, JSONObject.NULL);
             } else if (theObj instanceof String) {
                to.put(key, anonymizeString(anonymizerMap, synonymCache, (String) theObj, size, shortlived));
             } else if (theObj instanceof JSONObject) {
-               to.put(key, anonymizeJsonObject(anonymizerMap, synonymCache, (JSONObject) theObj, size, shortlived));
+               to.put(key, anonymizeJsonObject(anonymizerMap, synonymCache, (JSONObject) theObj, size, shortlived, whiteListLowerCase));
             } else if (theObj instanceof JSONArray) {
-               to.put(key, anonymizeJsonArray(anonymizerMap, synonymCache, (JSONArray) theObj, size, shortlived));
+               to.put(key, anonymizeJsonArray(anonymizerMap, synonymCache, (JSONArray) theObj, size, shortlived, whiteListLowerCase));
             } else if (theObj instanceof Number) {
                to.put(key, anonymiseNumber(anonymizerMap, synonymCache, (Number) theObj, size, shortlived));
             } else {
@@ -101,7 +112,7 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
    }
 
    private JSONArray anonymizeJsonArray(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, JSONArray innerArray, int size,
-         boolean shortlived) {
+         boolean shortlived, Set<String> whiteListLowerCase) {
       JSONArray toArray = new JSONArray();
       for (int i = 0; i < innerArray.length(); i++) {
          Object value = innerArray.get(i);
@@ -110,17 +121,13 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
          } else if (value instanceof String) {
             toArray.put(anonymizeString(anonymizerMap, synonymCache, (String) value, size, shortlived));
          } else if (value instanceof JSONArray) {
-            toArray.put(anonymizeJsonArray(anonymizerMap, synonymCache, (JSONArray) value, size, shortlived));
+            toArray.put(anonymizeJsonArray(anonymizerMap, synonymCache, (JSONArray) value, size, shortlived, whiteListLowerCase));
          } else if (value instanceof JSONObject) {
-            toArray.put(anonymizeJsonObject(anonymizerMap, synonymCache, (JSONObject) value, size, shortlived));
+            toArray.put(anonymizeJsonObject(anonymizerMap, synonymCache, (JSONObject) value, size, shortlived, whiteListLowerCase));
          } else {
             logger.error("Unable to determine synonym for value in json array " + value);
          }
       }
       return toArray;
-   }
-
-   private boolean isWhitelisted(String key) {
-      return whiteList.contains(key);
    }
 }

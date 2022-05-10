@@ -93,7 +93,7 @@ public class AnonymizerService {
 		if (synonym == null) {
 			if (column.getType() == JsonAnonymiser.type) {
 				// anonymise the column, putting individual synonyms in the cache and then caching the whole thing as a synonym so if we receive the same json we have it cached.
-				synonym= jsonAnonymiser.anonymize(customAnonymizers, synonymCache, from, column.getSize(), column.isShortLived());
+				synonym= jsonAnonymiser.anonymize(customAnonymizers, synonymCache, from, column.getSize(), column.isShortLived(), column.getParameters());
 			} else {
 				Anonymizer anonymizer = getAnonymizer(column.getType());
 				synonym = anonymizer.anonymize(from, column.getSize(), column.isShortLived(), column.getParameters());

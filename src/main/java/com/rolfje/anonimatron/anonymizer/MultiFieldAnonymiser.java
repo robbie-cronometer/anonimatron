@@ -26,8 +26,10 @@ public interface MultiFieldAnonymiser {
     * @param size       the optional maximum size of the generated value
     * @param shortlived indicates that the generated synonym must have the
     *                   {@link Synonym#isShortLived()} boolean set
+    * @param parameters
     * @return a {@link Synonym}
     */
-   Synonym anonymize(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, Object from, int size, boolean shortlived);
+   Synonym anonymize(Map<String, Anonymizer> anonymizerMap, SynonymCache synonymCache, Object from, int size, boolean shortlived,
+         Map<String, String> parameters);
 
 }
