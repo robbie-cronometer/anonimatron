@@ -29,7 +29,7 @@ public class JsonAnonymiser implements MultiFieldAnonymiser {
       }
 
       Set<String> whiteListLowerCase = new HashSet<>();
-      if (parameters.containsKey("whitelist")) {
+      if (parameters != null && parameters.containsKey("whitelist")) {
          String[] whitelistedFields = parameters.get("whitelist").split(",");
          for (String field : whitelistedFields) {
             whiteListLowerCase.add(field.trim());
