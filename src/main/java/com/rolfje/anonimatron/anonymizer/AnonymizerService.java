@@ -11,6 +11,8 @@ import java.util.*;
 public class AnonymizerService {
 	private static final Logger LOG = Logger.getLogger(AnonymizerService.class);
 
+
+	private JsonAnonymiser jsonAnonymiser = new JsonAnonymiser();
 	private Map<String, Anonymizer> customAnonymizers = new HashMap<>();
 	private Map<String, String> defaultTypeMapping = new HashMap<>();
 
@@ -35,6 +37,7 @@ public class AnonymizerService {
 		registerAnonymizer(new CharacterStringPrefetchAnonymizer());
 		registerAnonymizer(new DateAnonymizer());
 		registerAnonymizer(new IbanAnonymizer());
+		registerAnonymizer(new DigitNumberAnonymizer());
 
 		registerAnonymizer(new CountryCodeAnonymizer());
 		registerAnonymizer(new IpAnonymizer());
@@ -89,15 +92,19 @@ public class AnonymizerService {
 		Synonym synonym = getSynonym(column, from);
 
 		if (synonym == null) {
-            Anonymizer anonymizer = getAnonymizer(column.getType());
-            synonym = anonymizer.anonymize(from, column.getSize(), column.isShortLived(), column.getParameters());
-
+			if (column.getType().equalsIgnoreCase(JsonAnonymiser.type)) {
+				// anonymise the column, putting individual synonyms in the cache and then caching the whole thing as a synonym so if we receive the same json we have it cached.
+				synonym= jsonAnonymiser.anonymize(customAnonymizers, synonymCache, from, column.getSize(), column.isShortLived(), column.getParameters());
+			} else {
+				Anonymizer anonymizer = getAnonymizer(column.getType());
+				synonym = anonymizer.anonymize(from, column.getSize(), column.isShortLived(), column.getParameters());
+			}
 			synonymCache.put(synonym);
 		}
 		return synonym;
 	}
 
-	private Synonym getSynonym(Column c, Object from) {
+	private Synonym getSynonym(Column c,  Object from) {
 		if (c.isShortLived()){
 			return null;
 		}
@@ -131,6 +138,10 @@ public class AnonymizerService {
 		if (type == null) {
 			throw new UnsupportedOperationException(
 					"Can not anonymyze without knowing the column type.");
+		}
+
+		if (type.equalsIgnoreCase(JsonAnonymiser.type)) {
+			return null;
 		}
 
 		Anonymizer anonymizer = customAnonymizers.get(type);
