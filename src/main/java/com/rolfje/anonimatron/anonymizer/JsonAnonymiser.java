@@ -8,6 +8,20 @@ import java.util.*;
 
 import static org.apache.log4j.Logger.getLogger;
 
+
+//example
+
+/**
+ *
+ <table name="professional" whichWhitelist="userid" whitelistColumnName="userId">
+ <column name="meta" type="JSON" >
+ <parameter id="whitelist">
+ <value>plan,proManager</value>
+ </parameter>
+ </column>
+ </table>
+ */
+
 public class JsonAnonymiser implements MultiFieldAnonymiser {
 
 
