@@ -1,6 +1,6 @@
 package com.rolfje.anonimatron.anonymizer;
 
-import com.rolfje.anonimatron.configuration.Column;
+import com.rolfje.anonimatron.configuration.*;
 import com.rolfje.anonimatron.synonyms.NullSynonym;
 import com.rolfje.anonimatron.synonyms.Synonym;
 import org.apache.log4j.Logger;

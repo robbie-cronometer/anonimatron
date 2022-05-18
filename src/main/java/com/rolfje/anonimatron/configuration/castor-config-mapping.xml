@@ -126,7 +126,7 @@
 						<bind-xml name="id" node="attribute"/>
 					</field>
 					<field name="value" type="java.lang.String">
-						<bind-xml name="value" node="text"/>
+						<bind-xml name="value" node="element"/>
 					</field>
 				</class>
 			</bind-xml>

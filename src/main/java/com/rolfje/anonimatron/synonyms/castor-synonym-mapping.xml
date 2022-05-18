@@ -34,6 +34,20 @@
 		</field>
 	</class>
 
+	<class name="com.rolfje.anonimatron.synonyms.NumberSynonym">
+		<map-to xml="digitnumber" />
+		<field name="type" type="string">
+			<bind-xml name="type" node="attribute" />
+		</field>
+		<field name="from" type="long">
+			<bind-xml name="from" node="attribute" />
+		</field>
+		<field name="to" type="long">
+			<bind-xml name="to" node="attribute" />
+		</field>
+	</class>
+
+
 	<class name="com.rolfje.anonimatron.synonyms.HashedFromSynonym">
 		<map-to xml="hashed" />
 		<field name="type" type="string">

@@ -69,6 +69,21 @@ public class Configuration {
 		return configuration;
 	}
 
+	public static void writeToString(Column configuration) {
+		try {
+			Mapping mapping = getMapping();
+			StringWriter writer = new StringWriter();
+			Marshaller marshaller = new Marshaller(writer);
+			marshaller.setMapping(mapping);
+			marshaller.marshal(configuration);
+			System.out.println(writer.toString());
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
+	}
+
+
 	private void sanityCheck(){
 		if (getFiles() != null) {
 			for (DataFile dataFile : getFiles()) {
